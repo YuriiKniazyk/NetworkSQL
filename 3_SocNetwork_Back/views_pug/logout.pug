@@ -1,0 +1,13 @@
+doctype html
+html
+    head
+        title Welcome!
+        link(rel="stylesheet", href="css/style.css")
+    body
+        h1 Welcome to our site!
+        h3
+            if myUser
+            p= 'Fullname: ' + myUser.name + ' ' + myUser.surname + ' '
+        a(href="/find") Search people 
+        a(href="/people") All people 
+        a(href="/logout") Logout

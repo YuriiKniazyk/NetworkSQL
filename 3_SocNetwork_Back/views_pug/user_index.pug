@@ -1,0 +1,13 @@
+doctype html
+html
+    head
+        title= title 
+    body
+        h2 All people
+        h4
+            ul
+                each user in arrOfUsers
+                    li= 'Fullname: ' + user.name + ' ' + user.surname + ' '
+                        include partials/add
+    script(src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous")
+    script(src='js/main.js')            
