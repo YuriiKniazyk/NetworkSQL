@@ -2,23 +2,27 @@ const db = require('../../db/index').getInstance();
 const crypto = require('crypto');
 
 module.exports = async (req, res) => {
-    try{ 
-        const userModel = db.getModel('user')
-        const {name, surname, password, email} = req.body;
+    try {
+        const userModel = db.getModel('user');
+        const { name, surname, password, email } = req.body;
+        if (!name || !surname || !password || !email) throw new Error('Some field is empty!');
 
         let hash = crypto.createHash('md5').update(password).digest('hex');
 
-        const insertedUser = await userModel.create({
+        await userModel.create({
             name,
             surname,
             email,
-            password: hash            
+            password: hash
         });
 
-        res.json(insertedUser);
-    } 
-        catch(e){
-            
-            res.status(400).json(e.message);
+        res.status(200).json({ succses: true });
+    }
+    catch (e) {
+
+        res.status(400).json({
+            succses: false,
+            msg: e.message
+        });
     }
 };

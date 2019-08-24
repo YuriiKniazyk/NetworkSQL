@@ -8,31 +8,32 @@ class CreateUser extends Component {
             name: '',
             surname: '',
             email: '',
-            password: ''
+            password: '',
+            Authorized: false
         };
-        
+
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleChange(event) {
-        const {name, value} = event.target;            
+        const { name, value } = event.target;
 
         this.setState({
-          [name]: value
+            [name]: value
         });
     }
 
     handleSubmit(event) {
         event.preventDefault();
-        
+
         fetch('http://localhost:3300/user', {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             method: 'POST',
-            body: JSON.stringify({name: this.state.name, surname: this.state.surname, email: this.state.email, password: this.state.password})
+            body: JSON.stringify({ name: this.state.name, surname: this.state.surname, email: this.state.email, password: this.state.password })
         })
             .then(response => response.json())
             .then(data => {
@@ -59,7 +60,7 @@ class CreateUser extends Component {
                     </label>
                     <input type="submit" value="Submit" />
                 </form>
-            </div>
+            </div >
         )
     }
 

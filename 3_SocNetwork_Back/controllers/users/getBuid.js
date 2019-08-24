@@ -1,19 +1,49 @@
-const config = require('../config');
+const db = require('../../db/index').getInstance();
+const Op = require('sequelize').Op;
+const tokenVerify = require('../../helpers/tokenVerify');
 
 module.exports = async (req, res) => {
-    try{
+    try {
+        const userModel = await db.getModel('user');
         const userId = req.params.id;
-        await mongoose.connect(config.mongourl, {useNewUrlParser: true}, async function (err) {
-            if (err) throw err;
-                            
-            await userModel.findById(userId)
-            .exec(function(err, user) {
-                if (err) throw err;
-                if (!user) user = {Message: 'ERROR!!! User is not found!!!'};
-                res.json(user);
-            });
-        })     
-    } catch{
-        console.log(e);
+        const token = req.get('Authorization');
+
+        if (!token) throw new Error('No token');
+        const { id, name: userName } = tokenVerify(token);
+
+        const isUserReg = await userModel.findOne({
+            where: {
+                id,
+                name: userName
+            }
+        });
+        if (!isUserReg) throw new Error('User is not valid!!!');
+
+        if (!userId) {
+            const allUsers = await userModel.findAll({attributes: ['id', 'name', 'surname']});
+            return res.json(allUsers);
+        };
+
+        const allUsers = await userModel.findAll({
+            attributes: ['id', 'name', 'surname'],
+            where: {
+                [Op.and]: {
+                    id: {
+                        [Op.like]: `%${userId}%`
+                    }
+                }        
+            }
+        });
+
+        res.status(200).json({
+            succses: true,
+            accessUser: allUsers
+        });
+
+    } catch (e) {
+        res.status(400).json({
+            succses: false,
+            msg: e.message
+        });
     }
 };

@@ -1,25 +1,56 @@
-const config = require('../config');
+const config = require('../../constant/config');
+const db = require('../../db/index').getInstance();
+const Op = require('sequelize').Op;
+const tokenVerify = require('../../helpers/tokenVerify');
 
 module.exports = async (req, res) => {
-    try{
-        const {name} = req.query;
+    try {
+        const userModel = await db.getModel('user');
+        const { name = '' } = req.query;
+        const token = req.get('Authorization');
 
-        await mongoose.connect(config.mongourl, {useNewUrlParser: true}, async function (err) {
-            if (err) throw err;
-                        
-            await userModel.find({name: new RegExp(name, 'i')})
-            .exec(function(err, users) {
-                if (err) throw err;
-                
-                if (!users.length){
-                    users = {Message: 'ERROR!!! User is not found!!!'};
-                    res.json(users);
-                } else {
-                    res.json(users);
-                }
-            });
-        })
-    } catch (e){
-        console.log(e);
-    }    
+        if (!token) throw new Error('No token');
+        const { id, name: userName } = tokenVerify(token);
+
+        const isUserReg = await userModel.findOne({
+            where: {
+                id,
+                name: userName
+            }
+        });
+        if (!isUserReg) throw new Error('User is not valid!!!');
+
+        if (!name) {
+            const allUsers = await userModel.findAll({ attributes: ['id', 'name', 'surname'] });
+            return res.json(allUsers);
+        };
+
+        const allUsers = await userModel.findAll({
+            attributes: ['name', 'surname'],
+            where: {
+                [Op.or]: [{
+                    name: {
+                        [Op.like]: `%${name}%`
+                    }
+                },
+                {
+                    surname: {
+                        [Op.like]: `%${name}%`
+                    }
+
+                }]
+            }
+        });
+
+        res.status(200).json({
+            succses: true,
+            accessUser: allUsers
+        });
+
+    } catch (e) {
+        res.status(400).json({
+            succses: false,
+            msg: e.message
+        });
+    }
 };
