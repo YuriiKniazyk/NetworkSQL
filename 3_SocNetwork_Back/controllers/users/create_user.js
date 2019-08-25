@@ -5,6 +5,7 @@ module.exports = async (req, res) => {
     try {
         const userModel = db.getModel('user');
         const { name, surname, password, email } = req.body;
+        
         if (!name || !surname || !password || !email) throw new Error('Some field is empty!');
 
         let hash = crypto.createHash('md5').update(password).digest('hex');

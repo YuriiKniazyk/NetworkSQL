@@ -8,8 +8,7 @@ module.exports = (() => {
     function initConnection() {
         let client = new Sequalize('social', 'root', 'root', {
             host: 'localhost',
-            dialect: 'mysql',
-            operatorsAliases: false,
+            dialect: 'mysql'
         });
         let models = {};
 

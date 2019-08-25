@@ -3,13 +3,10 @@ const db = require('../../db/index').getInstance();
 module.exports = async (req, res) => {
     try {
         const userModel = await db.getModel('user');
-        const userId = req.params.id;
+        const userId = req.body.curentUser.id;
         
-        if (!userId) {            
-            return res.status(200).json({
-                succses: true,
-                accessUser: []
-            });
+        if (!userId) {                       
+            res.json('Profile not found');
         };
         
         const userByid = await userModel.findByPk(userId);

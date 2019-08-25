@@ -8,8 +8,7 @@ class CreateUser extends Component {
             name: '',
             surname: '',
             email: '',
-            password: '',
-            Authorized: false
+            password: ''
         };
 
         this.handleChange = this.handleChange.bind(this);
