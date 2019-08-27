@@ -7,7 +7,6 @@ module.exports = (token) => {
     jwt.verify(token, config.secret, (err, decode) => {
 
         if (err) throw new Error('Token is no valid!!!');
-        console.log(decode);
         
         user = decode;
     });

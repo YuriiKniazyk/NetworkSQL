@@ -9,6 +9,7 @@ const config = require('./constant/config');
 const error404 = require('./controllers/error404');
 const userRouter = require('./routes/userRouter');
 const authRouter = require('./routes/authRouter');
+const friendRouter = require('./routes/friendRouter');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,6 +35,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 app.use('/user', cors(corsOptions), userRouter);
 app.use('/login', cors(corsOptions), authRouter);
+app.use('/friend', cors(corsOptions), friendRouter);
 app.use('*', cors(corsOptions), error404);
 
 app.listen(config.port, err => {

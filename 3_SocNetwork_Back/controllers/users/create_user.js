@@ -18,8 +18,7 @@ module.exports = async (req, res) => {
         });
 
         res.status(200).json({ succses: true });
-    }
-    catch (e) {
+    } catch (e) {
 
         res.status(400).json({
             succses: false,

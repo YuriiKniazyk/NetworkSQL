@@ -24,7 +24,6 @@ module.exports = async (req, res, next) => {
     if (!isUserReg) throw new Error('User is not valid!!!');
 
     req.body.curentUser = {id, name};     
-    console.log(req.body.curentUser);
     
     next();
 }
