@@ -16,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
         password: {
             type: DataTypes.STRING
         },
+        forgotecodes: {
+            type: DataTypes.INTEGER
+        },
     }, {
         tableName: 'user',
         timestamps: false

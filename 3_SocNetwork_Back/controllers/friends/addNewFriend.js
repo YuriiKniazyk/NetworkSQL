@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
 
         const userToAdd = req.params.id;
         if(!userToAdd || userToAdd < 1) throw new Error('Bad user id');
-        
+        if(userToAdd == userId) throw new Error('Soory, bat you dont friend with yours');
         const isFriend = await friendModel.findOne({
             where:{
                 [Op.or]: [{

@@ -3,7 +3,6 @@ const db = require('../../db/index').getInstance();
 
 module.exports = async (req, res) => {
     try {
-        const userModel = await db.getModel('user');
         const friendModel = await db.getModel('friend'); 
         const userId = req.body.curentUser.id;
 
@@ -23,13 +22,9 @@ module.exports = async (req, res) => {
             }
         });
         
-        const allFriend = await friendModel.findAll({
-            include: [userModel]
-        });
-
         res.status(200).json({ 
             succses: true,
-            msg: allFriend
+            msg: 'ok'
         });
 
     } catch (e) {

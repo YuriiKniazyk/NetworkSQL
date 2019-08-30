@@ -14,7 +14,7 @@ const friendRouter = require('./routes/friendRouter');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-let whitelist = ['http://localhost:4200', 'http://localhost:3000'];
+let whitelist = ['http://localhost:3000', 'http://localhost:3300'];
 let corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
@@ -41,7 +41,7 @@ app.use('*', cors(corsOptions), error404);
 app.listen(config.port, err => {
   console.log('Server listen on port ' + config.port + '...');
 
-  if (config.itsStartupServer) {
-    opn('http://localhost:' + config.port);
-  }
+  // if (config.itsStartupServer) {
+  //   opn('http://localhost:' + config.port);
+  // }
 });

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
-const config = require('../constant/config');
+const config = require('../../constant/config');
 
-module.exports = (token) => {
+module.exports.login = (token) => {
     let user = null;
 
     jwt.verify(token, config.secret, (err, decode) => {
@@ -11,4 +11,4 @@ module.exports = (token) => {
         user = decode;
     });
     return user;
-}
+};

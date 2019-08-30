@@ -4,7 +4,7 @@ module.exports = async (req, res) => {
     try {
         const userModel = await db.getModel('user');
         const userId = req.body.curentUser.id;
-        
+                
         if (!userId) {                       
             res.json('Profile not found');
         };
