@@ -4,27 +4,17 @@ const crypto = require('crypto');
 module.exports = async (req, res) => {
     try {
         const userModel = await db.getModel('user');
-        let {email, password, passwordVerify, forgotecodes} = req.body;
+        let {email, forgotecodes} = req.body;
+        if(email === undefined) throw new Error('Please enter email!!!!');
+        if(forgotecodes === undefined) throw new Error('Please enter forgotecodes!!!!');
         const user = await userModel.findOne({
             where: {
                 email,
                 forgotecodes
             }
         });        
-        if(!user) throw new Error('User is not register!!!!');
-
-        if (!password || !passwordVerify || password !== passwordVerify) throw new Error('Wrong password or passwordVerify');
-
-        let hash = crypto.createHash('md5').update(password).digest('hex');
+        if(!user) throw new Error('Wrong data of user!!!!');
         
-        await userModel.update({
-            password: hash
-        },{
-            where: {
-                id: user.id
-            }
-        });
-
         res.status(200).json({ 
             succses: true,
             msg: 'ok'

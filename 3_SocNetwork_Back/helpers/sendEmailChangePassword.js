@@ -25,7 +25,6 @@ function buildTemplates(codes, email) {
     const html = `<h1> Password change </h1>
         If its your place click link: http://localhost:3000/setpassword?email=${email}&codes=${codes}  
         or user this code: <span style="color: red">${codes}</span>`
-    console.log(html);
         
     return html;
 }

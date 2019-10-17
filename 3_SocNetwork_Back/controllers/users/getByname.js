@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
 
         res.status(200).json({
             succses: true,
-            accessUser: allUsers
+            allUser: allUsers
         });
 
     } catch (e) {

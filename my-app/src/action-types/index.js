@@ -1,0 +1,9 @@
+export const REGISTER = 'REGISTER';
+export const LOGIN = 'LOGIN';
+export const AUTHORIZATION = 'AUTHORIZATION';
+export const LOGOUT = 'LOGOUT';
+export const PROFILE = 'PROFILE';
+export const FINDBYNAME = 'FINDBYNAME';
+export const FORGOTEPASSWORD = 'FORGOTEPASSWORD';
+export const SENDCODEANDEMAIL = 'SENDCODEANDEMAIL';
+export const UPDATEPASSWORD = 'UPDATEPASSWORD';

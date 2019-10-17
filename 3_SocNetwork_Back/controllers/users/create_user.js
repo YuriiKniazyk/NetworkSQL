@@ -17,7 +17,10 @@ module.exports = async (req, res) => {
             password: hash
         });
 
-        res.status(200).json({ succses: true });
+        res.status(200).json({ 
+            succses: true,
+            msg: 'OK'
+        });
     } catch (e) {
 
         res.status(400).json({

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import DefaultOptionen from '../../helpers/defaultOptions'
+import { connect } from 'react-redux';
 
 class ProfileId extends Component {
 
@@ -7,18 +7,18 @@ class ProfileId extends Component {
         super(props);
         this.state = {
             id: +props.match.params.id,
-            name: '',
-            surname: '',
         };
 
         fetch('http://localhost:3300/user/' + this.state.id, {
-            headers: DefaultOptionen.headers,
+            headers: { 
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': this.props.token.type + ' ' + this.props.token.accessToken
+            },
             method: 'GET'
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-            
             this.setState({id: data.accessUser.id, name: data.accessUser.name, surname: data.accessUser.surname});
         });
 
@@ -28,12 +28,17 @@ class ProfileId extends Component {
        
         return (
             <div>
-               profile
-               {this.state.id}, {this.state.name}, {this.state.surname}
+               Profile {this.state.id}: {this.state.name} {this.state.surname}
             </div>
         )
     }
 
-}
+};
 
-export default ProfileId;
+const mapStateToProps = (state) => {
+    return {
+        token: state.token, 
+    }
+};
+
+export default connect(mapStateToProps, undefined)(ProfileId);
