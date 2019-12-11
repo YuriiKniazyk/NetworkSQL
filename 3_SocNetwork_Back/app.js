@@ -13,6 +13,7 @@ const friendRouter = require('./routes/friendRouter');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 let whitelist = ['http://localhost:3000', 'http://localhost:3300'];
 let corsOptions = {
