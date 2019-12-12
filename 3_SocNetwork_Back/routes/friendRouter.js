@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const token = require('../helpers/token/token');
+const token = require('../middlewares/token');
 const addNewFriend = require('../controllers/friends/addNewFriend');
 const deleteFriend = require('../controllers/friends/deleteFriend');
 const getAllFriend = require('../controllers/friends/getAllFriend');

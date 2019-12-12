@@ -1,5 +1,6 @@
 module.exports = {
     itsStartupServer: true,
     port: 3300,
-    secret: 'NastyaMasha'
-}
+    secret: 'NastyaMasha',
+    refreshSecret: 'NastyaMashaSuperSecret'
+};

@@ -1,3 +1,5 @@
-module.exports = (req, res)=> {
-    res.status(404).json({Message: 'Oops....Something went wrong....'});
+module.exports = (req, res, next)=> {
+    const err = new Error('Page not found');
+    err.status = 404;
+    next(err);
 };

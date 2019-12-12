@@ -10,10 +10,12 @@ const error404 = require('./controllers/error404');
 const userRouter = require('./routes/userRouter');
 const authRouter = require('./routes/authRouter');
 const friendRouter = require('./routes/friendRouter');
+const fileUpload = require('express-fileupload');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(fileUpload());
 
 let whitelist = ['http://localhost:3000', 'http://localhost:3300'];
 let corsOptions = {
@@ -38,6 +40,20 @@ app.use('/user', cors(corsOptions), userRouter);
 app.use('/login', cors(corsOptions), authRouter);
 app.use('/friend', cors(corsOptions), friendRouter);
 app.use('*', cors(corsOptions), error404);
+app.use((err, req, res, next) => {
+  console.log('+++++++++++++++++++++++++++++++');
+  console.log(err);
+  console.log('+++++++++++++++++++++++++++++++');
+  let e;
+  const isSql = err.parent;
+  if(isSql) e = err.parent.sqlMessage;
+  res
+      .status(err.status || 500)
+      .json({
+        success: false,
+        message: e || err.message || 'Unknown Error'
+      });
+});
 
 app.listen(config.port, err => {
   console.log('Server listen on port ' + config.port + '...');

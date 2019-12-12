@@ -1,5 +1,6 @@
-const tokenVerify = require('./tokenVerify');
-const db = require('../../db/index').getInstance();
+const tokenVerify = require('../helpers/token/tokenVerify');
+const db = require('../db').getInstance();
+const controllerError = require('../error/ControllerError');
 
 module.exports = {
     
@@ -8,11 +9,11 @@ module.exports = {
             const userModel = db.getModel('user');
             const token = req.get('Authorization');
             
-            if (!token) throw new Error('No Authorization!!!');
+            if (!token) throw new controllerError('No Authorization!!!', 401, 'checkToken');
             let parts = token.split(' ');
     
             let accsesToken = parts[1];
-            if (!accsesToken) throw new Error('No token!!!');
+            if (!accsesToken) throw new controllerError('No token!!!', 401, 'checkToken');
     
             const { id, name } = tokenVerify.login(accsesToken);
             
@@ -28,8 +29,8 @@ module.exports = {
             req.body.curentUser = {id, name};
             next();
 
-        } catch(e){
-            console.log(e);
+        } catch(e) {
+            next(new controllerError((e.message, e.status, 'checkToken')));
         }        
     }
 
