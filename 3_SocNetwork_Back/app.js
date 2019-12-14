@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const path = require('path');
+const {resolve: resolvePath} = require('path');
 const opn = require('opn');
 const cors = require('cors');
 const dataBase = require('./db/index').getInstance();
@@ -14,8 +14,9 @@ const fileUpload = require('express-fileupload');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(resolvePath(__dirname, 'public')));
 app.use(fileUpload());
+global.appRoot = __dirname;
 
 let whitelist = ['http://localhost:3000', 'http://localhost:3300'];
 let corsOptions = {
@@ -35,23 +36,18 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
+app.get('/', (req, res) => { res.sendFile(resolvePath(__dirname, 'index.html')); });
 app.use('/user', cors(corsOptions), userRouter);
 app.use('/login', cors(corsOptions), authRouter);
 app.use('/friend', cors(corsOptions), friendRouter);
 app.use('*', cors(corsOptions), error404);
 app.use((err, req, res, next) => {
-  console.log('+++++++++++++++++++++++++++++++');
-  console.log(err);
-  console.log('+++++++++++++++++++++++++++++++');
-  let e;
-  const isSql = err.parent;
-  if(isSql) e = err.parent.sqlMessage;
   res
       .status(err.status || 500)
       .json({
         success: false,
-        message: e || err.message || 'Unknown Error'
+        message: err.message || 'Unknown Error',
+        controller: err.controller
       });
 });
 

@@ -1,1 +1,0 @@
-module.exports.IMAGES = ['image/jpeg', 'image/png', 'image/pjpeg'];

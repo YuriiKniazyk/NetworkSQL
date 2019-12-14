@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: true
         },
         path: {
+            type: DataTypes.TEXT,
+            allowNull: false
+        },
+        name: {
             type: DataTypes.STRING,
             allowNull: false
         }

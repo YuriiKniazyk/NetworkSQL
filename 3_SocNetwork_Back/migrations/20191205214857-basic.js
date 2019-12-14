@@ -73,6 +73,10 @@ module.exports = {
                 onDelete: 'CASCADE'
             },
             path: {
+                type: Sequelize.TEXT,
+                allowNull: false
+            },
+            name: {
                 type: Sequelize.STRING,
                 allowNull: false
             }

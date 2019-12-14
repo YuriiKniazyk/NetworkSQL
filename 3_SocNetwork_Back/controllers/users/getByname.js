@@ -1,7 +1,8 @@
 const db = require('../../db/index').getInstance();
 const Op = require('sequelize').Op;
+const ControllerError = require('../../error/ControllerError');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
     try {
         
         const userModel = await db.getModel('user');
@@ -12,7 +13,7 @@ module.exports = async (req, res) => {
                 succses: true,
                 accessUser: []
             });
-        };
+        }
 
         const allUsers = await userModel.findAll({
             attributes: ['id', 'name', 'surname'],
@@ -37,10 +38,6 @@ module.exports = async (req, res) => {
         });
 
     } catch (e) {
-
-        res.status(400).json({
-            succses: false,
-            msg: e.message
-        });
+        next(new ControllerError(e.message, e.status, 'getByName'));
     }
 };

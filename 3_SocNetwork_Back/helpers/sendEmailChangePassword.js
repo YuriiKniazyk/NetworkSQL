@@ -18,7 +18,7 @@ module.exports = async (email, codes) => {
         html: buildTemplates(codes, email)
     });
     console.log('info: ', info);
-}
+};
 
 function buildTemplates(codes, email) {  
 
