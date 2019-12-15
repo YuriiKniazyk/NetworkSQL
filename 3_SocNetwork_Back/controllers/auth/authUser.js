@@ -6,9 +6,8 @@ const ControllerError = require('../../error/ControllerError');
 module.exports = async (req, res, next) => {
     try {
         const UserModel = db.getModel('user');
-        const { email, password } = req.body;       
-        
-        if (!email || !password) new ControllerError('Some field is empty!', 400);
+        const { email, password } = req.body;
+        if (!email || !password) new ControllerError('Some field is empty!', 400, 'authUser');
 
         let hash = crypto.createHash('md5').update(password).digest('hex');
         
@@ -19,7 +18,7 @@ module.exports = async (req, res, next) => {
             }
         });
 
-        if (!isUserReg) new ControllerError('You are not register!!!', 400);
+        if (!isUserReg) new ControllerError('You are not register!!!', 400, 'authUser');
 
         const { id, name } = isUserReg;
         let token = tokenazer.login({ id, name });

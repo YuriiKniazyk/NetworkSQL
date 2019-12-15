@@ -10,30 +10,30 @@ module.exports = async(req, res, next) => {
     try {
         const userModel = db.getModel('user');
         const photoModel = db.getModel('photo');
-
-        const { name, surname, password, email } = req.body;
+        const { name, surname, password, email, city=null, birthDay=null } = req.body;
         const {photo} = req.files;
 
-        if (!name || !surname || !password || !email) throw new ControllerError('Some field is empty!', 400);
+
+        if (!name || !surname || !password || !email) throw new ControllerError('Some field is empty!', 400, 'createUser');
 
         const isUserPresent = await userModel.findOne({
-
             where: {
                 email
             }
         });
 
         if (isUserPresent) {
-            throw new ControllerError('User already registered', 400);
+            throw new ControllerError('User already registered', 400, 'createUser');
         }
 
         let hash = crypto.createHash('md5').update(password).digest('hex');
-
         const insertedUser = await userService.createUser({
             name,
             surname,
             email,
-            password: hash
+            password: hash,
+            city,
+            birthDay
         });
 
         const {id} = insertedUser.dataValues;
@@ -47,7 +47,9 @@ module.exports = async(req, res, next) => {
                 path: goodPhoto.path,
                 name: goodPhoto.name
             });
+            await userService.updateUser({photo: photo.path}, id);
         }
+
         delete insertedUser.dataValues.password;
 
         res.status(200).json({
@@ -59,6 +61,7 @@ module.exports = async(req, res, next) => {
             }
         });
     } catch (e) {
+        console.log(e)
         next(new ControllerError(e.message, e.status, 'createUser'));
     }
 };

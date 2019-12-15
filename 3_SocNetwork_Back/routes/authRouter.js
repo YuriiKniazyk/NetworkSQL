@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const token = require('../middlewares/token');
+const token = require('../middlewares/checkToken');
 const authUser = require('../controllers/auth/authUser');
 const updatePassword = require('../controllers/auth/updatePassword');
 const changePassword = require('../controllers/auth/changePassword');

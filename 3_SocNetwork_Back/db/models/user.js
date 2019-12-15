@@ -20,6 +20,24 @@ module.exports = (sequelize, DataTypes) => {
         forgotecodes: {
             type: DataTypes.INTEGER
         },
+        city: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        birthDay: {
+            type: DataTypes.STRING,
+             allowNull: true
+        },
+        photo: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        created_at: {
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW,
+            allowNull: false
+        },
+
     }, {
         tableName: 'user',
         timestamps: false
