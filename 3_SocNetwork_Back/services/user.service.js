@@ -38,6 +38,11 @@ class UserService {
             throw new ControllerError(e.parent.sqlMessage, 500, 'userService/updateUser');
         }
     }
+
+    findUserByParams (userObj) {
+        const UserModel = db.getModel('user');
+        return UserModel.findAll({where: userObj});
+    }
 }
 
 module.exports = new UserService();

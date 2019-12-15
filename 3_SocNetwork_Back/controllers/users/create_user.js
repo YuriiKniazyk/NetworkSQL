@@ -1,64 +1,56 @@
 const crypto = require('crypto');
 const {resolve: resolvePath} = require('path');
+const joi = require('joi');
 const db = require('../../db/index').getInstance();
 const ControllerError = require('../../error/ControllerError');
 const fileChecker = require('../../helpers/fileChecker');
 const {USERS} = require('../../constant/fileDirEnum');
 const {userService} = require('../../services');
+const {userValidator} = require('../../validators');
 
 module.exports = async(req, res, next) => {
     try {
-        const userModel = db.getModel('user');
         const photoModel = db.getModel('photo');
-        const { name, surname, password, email, city=null, birthDay=null } = req.body;
-        const {photo} = req.files;
 
+        const userObj = req.body;
+        const isUserValid = joi.validate(userObj, userValidator);
 
-        if (!name || !surname || !password || !email) throw new ControllerError('Some field is empty!', 400, 'createUser');
+        if(isUserValid.error) {
+            throw new ControllerError(isUserValid.error.details[0].message, 400, 'users/createUser');
+        }
 
-        const isUserPresent = await userModel.findOne({
-            where: {
-                email
-            }
-        });
-
-        if (isUserPresent) {
+        const isUserPresent = await userService.findUserByParams({email: userObj.email});
+        if (isUserPresent.length) {
             throw new ControllerError('User already registered', 400, 'createUser');
         }
 
-        let hash = crypto.createHash('md5').update(password).digest('hex');
-        const insertedUser = await userService.createUser({
-            name,
-            surname,
-            email,
-            password: hash,
-            city,
-            birthDay
-        });
+        userObj.password = crypto.createHash('md5').update(userObj.password).digest('hex');
 
+        const insertedUser = await userService.createUser(userObj);
         const {id} = insertedUser.dataValues;
-        if(photo) {
-            const {photo: goodPhoto} = await fileChecker(req.files, id, USERS);
 
-            goodPhoto.mv(resolvePath(`${appRoot}/public/${goodPhoto.path}`));
+        if(req.files) {
+            const {photo} = req.files;
+            if(photo) {
+                const {photo: goodPhoto} = await fileChecker(req.files, id, USERS);
 
-            await  photoModel.create({
-                user_id: id,
-                path: goodPhoto.path,
-                name: goodPhoto.name
-            });
-            await userService.updateUser({photo: photo.path}, id);
+                goodPhoto.mv(resolvePath(`${appRoot}/public/${goodPhoto.path}`));
+
+                await  photoModel.create({
+                    user_id: id,
+                    path: goodPhoto.path,
+                    name: goodPhoto.name
+                });
+
+                await userService.updateUser({photo: photo.path}, id);
+            }
         }
 
         delete insertedUser.dataValues.password;
 
         res.status(200).json({
             succses: true,
-            user: insertedUser,
-            avatar: {
-                path: photo.path,
-                name: photo.name
-            }
+            user: insertedUser
         });
     } catch (e) {
         console.log(e)
