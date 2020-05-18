@@ -30,6 +30,6 @@
     "devDependencies": {
         "express-fileupload": "^1.1.6",
         "sequelize": "^5.21.2",
-      "chalk": "latest"
+        "chalk": "latest"
     }
 }
