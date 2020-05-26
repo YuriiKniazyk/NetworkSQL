@@ -1,30 +1,27 @@
-const db = require('../../db/index').getInstance();
+const ControllerError = require('../../error/ControllerError');
+const {userService} = require('../../services');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
     try {
-        const userModel = await db.getModel('user');
         const userId = req.body.curentUser.id;
                 
-        if (!userId) {                       
-            res.json('Profile not found');
-        };
+        if (!userId) {
+            throw new ControllerError('Profile not found', 404, 'users/profileUser');
+        }
         
-        const userByid = await userModel.findByPk(userId);
+        const userById = await userService.findUserById(userId);
         const user = {
-            id: userByid.id,
-            name: userByid.name,
-            surname: userByid.surname
+            id: userById.id,
+            name: userById.name,
+            surname: userById.surname
         }
 
         res.status(200).json({
-            succses: true,
+            success: true,
             accessUser: user
         });
 
     } catch (e) {
-        res.status(400).json({
-            succses: false,
-            msg: e.message
-        });
+        next(new ControllerError(e.message, e.status, 'profileUser'));
     }
 };

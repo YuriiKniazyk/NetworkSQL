@@ -1,40 +1,26 @@
-const db = require('../../db/index').getInstance();
 const sendEmail = require('../../helpers/sendEmailChangePassword');
+const {userService} = require('../../services');
+const ControllerError = require('../../error/ControllerError');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
     try {
-        const userModel = await db.getModel('user');
         const {email} = req.body;
-        
-        const user = await userModel.findOne({
-            where: {
-                email
-            }
-        });        
-        if(!user) throw new Error('User is not register!!!!');
+        if(!email) throw new ControllerError('Enter email', 400, 'auth/sendChangeEmail');
+
+        const user = await userService.findUserByParams({email});
+        if(user.length < 1) throw new ControllerError('User is not register!!!!', 400, 'auth/sendChangeEmail');
 
         let randomCodes = Math.round(Math.random() * (999999 - 111111) + 111111);
-        await userModel.update({
-            forgotecodes: randomCodes
-        },{
-            where: {
-                id: user.id
-            } 
-        });
+        await userService.updateUser({forgotecodes: randomCodes}, {id: user.id});
 
-
-       await sendEmail(email, randomCodes);
+        await sendEmail(email, randomCodes);
 
         res.status(200).json({ 
-            succses: true,
+            success: true,
             msg: 'ok'
         });
         
     } catch (e) {
-
-        res.status(400).json({
-            succses: false,
-            msg: e.message
-        });
+        next(new ControllerError(e.message, e.status, 'sendChangeEmail'));
     }
 };

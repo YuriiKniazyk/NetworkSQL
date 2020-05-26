@@ -1,4 +1,5 @@
 const db = require('../db/index').getInstance();
+const Op = require('sequelize').Op;
 const ControllerError = require('../error/ControllerError');
 const queryBilder = require('../helpers/queryBilder');
 
@@ -13,15 +14,12 @@ class UserService {
         }
     }
 
-    filterUsers(params) {
+    async createPhoto(photoObj) {
         try {
-            const client = db.getClient();
-            const query = queryBilder(params);
-
-            return  client.query(query);
-            
+            const photoModel = db.getModel('photo');
+            return await photoModel.create(photoObj)
         } catch (e) {
-            throw new ControllerError(e.parent.sqlMessage, 500, 'userService/filterUsers');
+            throw new ControllerError(e.parent.sqlMessage, 500, 'userService/createUser');
         }
     }
     
@@ -39,10 +37,57 @@ class UserService {
         }
     }
 
+    filterUsers(params) {
+        try {
+            const client = db.getClient();
+            const query = queryBilder(params);
+
+            return  client.query(query);
+
+        } catch (e) {
+            throw new ControllerError(e.parent.sqlMessage, 500, 'userService/filterUsers');
+        }
+    }
+
     findUserByParams (userObj) {
         const UserModel = db.getModel('user');
         return UserModel.findAll({where: userObj});
     }
+
+    findUserByName (name) {
+        const UserModel = db.getModel('user');
+        return UserModel.findAll({
+            attributes: ['id', 'name', 'surname'],
+            where: {
+                [Op.or]: [{
+                    name: {
+                        [Op.like]: `%${name}%`
+                    }
+                },
+                {
+                    surname: {
+                        [Op.like]: `%${name}%`
+                    }
+
+                }]
+            }
+        });
+    }
+
+    findUserById (userId) {
+        const UserModel = db.getModel('user');
+        return UserModel.findByPk(userId);
+    }
+
+    findPhoto (userId) {
+        const PhotoModel = db.getModel('photo');
+        return PhotoModel.findAll({
+            where: {
+                user_id: userId
+            }
+        })
+    }
+
 }
 
 module.exports = new UserService();

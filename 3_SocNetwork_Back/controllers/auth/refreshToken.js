@@ -5,7 +5,7 @@ const tokenVerify = require('../../helpers/token/tokenVerify');
 module.exports = (req, res, next) => {
     try {
         const token = req.get('Authorization');
-        if(!token) new ControllerError('No token', 401, 'refreshToken');
+        if(!token) throw new ControllerError('No token', 401, 'auth/refreshToken');
 
         const user = tokenVerify.refresh(token);
         delete user.exp, user.iat;

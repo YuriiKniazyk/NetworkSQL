@@ -1,44 +1,36 @@
-const db = require('../../db/index').getInstance();
+const ControllerError = require('../../error/ControllerError');
+const {userService} = require('../../services');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
     try {
-        const userModel = await db.getModel('user');
-        const photoModel = await db.getModel('photo');
         const userId = req.params.id;
         
-        if (!userId) {            
+        if (!userId) {
             return res.status(200).json({
-                succses: true,
+                success: true,
                 accessUser: []
             });
-        };
+        }
         
-        const userByid = await userModel.findByPk(userId);
-        const photos = await photoModel.findAll({
-            where: {
-                user_id: userId
-            }
-        });
+        const userById = await userService.findUserById(userId);
+        const photos = await userService.findPhoto(userId)
 
-        if(!userByid) throw  new Error('User is not found');
-        userByid.dataValues.photos = photos;
+        if(!userById) throw new ControllerError('User is not found!', 400, 'users/getById');
+        userById.dataValues.photos = photos;
 
         const user = {
-            id: userByid.id,
-            name: userByid.name,
-            surname: userByid.surname,
-            photo: userByid.dataValues.photos
+            id: userById.id,
+            name: userById.name,
+            surname: userById.surname,
+            photo: userById.dataValues.photos
         };
 
         res.status(200).json({
-            succses: true,
+            success: true,
             accessUser: user
         });
 
     } catch (e) {
-        res.status(400).json({
-            succses: false,
-            msg: e.message
-        });
+        next(new ControllerError(e.message, e.status, 'getById'));
     }
 };

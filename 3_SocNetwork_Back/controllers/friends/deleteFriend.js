@@ -1,37 +1,23 @@
-const Op = require('sequelize').Op;
-const db = require('../../db/index').getInstance();
+const {friendService, userService} = require('../../services');
+const ControllerError = require('../../error/ControllerError');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
     try {
-        const friendModel = await db.getModel('friend'); 
         const userId = req.body.curentUser.id;
-
         const userToAdd = req.params.id;
-        if(!userToAdd || userToAdd < 1) throw new Error('Bad user id');
-        
-        await friendModel.destroy({
-            where:{
-                [Op.or]: [{
-                    user_id: userId,
-                    friend_id: userToAdd
-                },
-                {
-                    friend_id: userId,
-                    user_id: userToAdd
-                }]
-            }
-        });
+        if(!userToAdd || userToAdd < 1) throw new ControllerError('Bad user id', 400, 'friends/deleteFriend');
+
+        const isUserToAdd = await userService.findUserById(userToAdd);
+        if(!isUserToAdd) throw new ControllerError('This user not exist', 400, 'friends/deleteFriend');
+
+        await friendService.deleteFromFriend(userId, userToAdd);
         
         res.status(200).json({ 
-            succses: true,
+            success: true,
             msg: 'ok'
         });
 
     } catch (e) {
-
-        res.status(400).json({
-            succses: false,
-            msg: e.message
-        });
+        next(new ControllerError(e.message, e.status, 'deleteFriend'));
     }
 };

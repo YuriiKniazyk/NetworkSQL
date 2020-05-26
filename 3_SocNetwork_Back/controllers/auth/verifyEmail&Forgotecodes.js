@@ -1,30 +1,21 @@
-const db = require('../../db/index').getInstance();
-const crypto = require('crypto');
+const {userService} = require('../../services');
+const ControllerError = require('../../error/ControllerError');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
     try {
-        const userModel = await db.getModel('user');
-        let {email, forgotecodes} = req.body;
-        if(email === undefined) throw new Error('Please enter email!!!!');
-        if(forgotecodes === undefined) throw new Error('Please enter forgotecodes!!!!');
-        const user = await userModel.findOne({
-            where: {
-                email,
-                forgotecodes
-            }
-        });        
-        if(!user) throw new Error('Wrong data of user!!!!');
+        const {email, forgotecodes} = req.body;
+        if(email === undefined) throw new ControllerError('Please enter email!!!!', 400, 'auth/verifyEmail&Forgotecodes');
+        if(forgotecodes === undefined) throw new ControllerError('Please enter forgotecodes!!!!', 400, 'auth/verifyEmail&Forgotecodes');
+
+        const user = await userService.findUserByParams({email, forgotecodes});
+        if(user.length < 1) throw new ControllerError('Wrong data of user!!!!', 400, 'auth/verifyEmail&Forgotecodes');
         
         res.status(200).json({ 
-            succses: true,
+            success: true,
             msg: 'ok'
         });
         
     } catch (e) {
-
-        res.status(400).json({
-            succses: false,
-            msg: e.message
-        });
+        next(new ControllerError(e.message, e.status, 'updatePassword'));
     }
 };

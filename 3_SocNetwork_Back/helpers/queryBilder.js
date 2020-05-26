@@ -1,5 +1,3 @@
-const ControllerError = require('../error/ControllerError');
-
 module.exports = (params) => {
     let query = `SELECT u.id, u.email, u.name, u.surname FROM user u`;
 

@@ -1,11 +1,8 @@
-const Sequalize = require('sequelize');
-const Op = require('sequelize').Op;
-const db = require('../../db/index').getInstance();
+const {friendService} = require('../../services');
+const ControllerError = require('../../error/ControllerError');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
     try {
-        const userModel = await db.getModel('user');
-        const friendModel = await db.getModel('friend');  
         const userId = req.body.curentUser.id;
         let {limit = 20, page = 1} = req.query;  
         
@@ -15,49 +12,19 @@ module.exports = async (req, res) => {
         const resObj = {};
         const offset = page * limit;
         
-        const friendCount = await friendModel.findOne({
-            attributes: [[Sequalize.fn('COUNT', Sequalize.col('id')), 'count_of_friends']],
-            where:{
-                [Op.or]: [{
-                    user_id: userId,
-                },
-                {
-                    friend_id: userId,
-                }]
-            }
-        });
+        const friendCount = await friendService.findOneFriend(userId);
       
-        const allUsers = await friendModel.findAll({
-            attributes: [],
-            where: {
-                [Op.or]: [{
-                    user_id: userId,
-                },
-                {
-                    friend_id: userId,
-                }]
-            },
-            include: [{
-                model: userModel,
-                attributes: ['name', 'surname']
-            }],
-            limit: +limit,
-            offset
-        });
+        const allUsers = await friendService.findAllFriend(userId, limit, offset)
         
         resObj.friends = allUsers;
         resObj.pageCount = Math.ceil(friendCount.dataValues.count_of_friends / limit);
 
         res.status(200).json({ 
-            succses: true,
+            success: true,
             msg: resObj
         });
 
     } catch (e) {
-
-        res.status(400).json({
-            succses: false,
-            msg: e.message
-        });
+        next(new ControllerError(e.message, e.status, 'getAllFriend'));
     }
 };

@@ -1,39 +1,20 @@
-const db = require('../../db/index').getInstance();
-const Op = require('sequelize').Op;
+const {userService} = require('../../services');
 const ControllerError = require('../../error/ControllerError');
 
 module.exports = async (req, res, next) => {
     try {
-        
-        const userModel = await db.getModel('user');
         const { name = '' } = req.query;
        
         if (!name) {
             return res.status(200).json({
-                succses: true,
+                success: true,
                 accessUser: []
             });
         }
-
-        const allUsers = await userModel.findAll({
-            attributes: ['id', 'name', 'surname'],
-            where: {
-                [Op.or]: [{
-                    name: {
-                        [Op.like]: `%${name}%`
-                    }
-                },
-                {
-                    surname: {
-                        [Op.like]: `%${name}%`
-                    }
-
-                }]
-            }
-        });
+        const allUsers = await userService.findUserByName(name);
 
         res.status(200).json({
-            succses: true,
+            success: true,
             allUser: allUsers
         });
 

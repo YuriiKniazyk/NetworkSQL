@@ -36,7 +36,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/', (req, res) => { res.sendFile(resolvePath(__dirname, 'index.html')); });
 app.use('/user', cors(corsOptions), userRouter);
 app.use('/login', cors(corsOptions), authRouter);
 app.use('/friend', cors(corsOptions), friendRouter);

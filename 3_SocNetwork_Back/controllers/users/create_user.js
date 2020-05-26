@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const {resolve: resolvePath} = require('path');
 const joi = require('joi');
-const db = require('../../db/index').getInstance();
 const ControllerError = require('../../error/ControllerError');
 const fileChecker = require('../../helpers/fileChecker');
 const {USERS} = require('../../constant/fileDirEnum');
@@ -10,8 +9,6 @@ const {userValidator} = require('../../validators');
 
 module.exports = async(req, res, next) => {
     try {
-        const photoModel = db.getModel('photo');
-
         const userObj = req.body;
         const isUserValid = joi.validate(userObj, userValidator);
 
@@ -36,12 +33,12 @@ module.exports = async(req, res, next) => {
 
                 goodPhoto.mv(resolvePath(`${appRoot}/public/${goodPhoto.path}`));
 
-                await  photoModel.create({
+                let photoObj = {
                     user_id: id,
                     path: goodPhoto.path,
                     name: goodPhoto.name
-                });
-
+                };
+                await  userService.createPhoto(photoObj);
                 await userService.updateUser({photo: photo.path}, id);
             }
         }
@@ -49,11 +46,10 @@ module.exports = async(req, res, next) => {
         delete insertedUser.dataValues.password;
 
         res.status(200).json({
-            succses: true,
+            success: true,
             user: insertedUser
         });
     } catch (e) {
-        console.log(e)
         next(new ControllerError(e.message, e.status, 'createUser'));
     }
 };

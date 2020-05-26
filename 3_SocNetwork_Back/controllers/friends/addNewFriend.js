@@ -1,44 +1,29 @@
-const Op = require('sequelize').Op;
-const db = require('../../db/index').getInstance();
+const {friendService, userService} = require('../../services');
+const ControllerError = require('../../error/ControllerError');
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
     try {
-        const friendModel = await db.getModel('friend');  
         const userId = req.body.curentUser.id;
 
         const userToAdd = req.params.id;
-        if(!userToAdd || userToAdd < 1) throw new Error('Bad user id');
-        if(userToAdd == userId) throw new Error('Soory, bat you dont friend with yours');
-        const isFriend = await friendModel.findOne({
-            where:{
-                [Op.or]: [{
-                    user_id: userId,
-                    friend_id: userToAdd
-                },
-                {
-                    friend_id: userId,
-                    user_id: userToAdd
-                }]
-            }
-        })
+        if(!userToAdd || userToAdd < 1) throw new ControllerError('Bad user id', 400, 'friends/addNewFriend');
 
-        if(isFriend) throw new Error('u are friend');
+        const isUserToAdd = await userService.findUserById(userToAdd);
+        if(!isUserToAdd) throw new ControllerError('This user not exist', 400, 'friends/addNewFriend');
+
+        if(userToAdd == userId) throw new ControllerError('Sorry, bat you dont friend with yours', 400, 'friends/addNewFriend');
+
+        const isFriend = await friendService.addToFriendFindOneFriend(userId, userToAdd);
+        if(isFriend) throw new ControllerError('You are friend', 400, 'friends/addNewFriend');
         
-        await friendModel.create({
-            user_id: userId,
-            friend_id: userToAdd
-        });
+        await friendService.createFriend(userId, userToAdd);
 
         res.status(200).json({ 
-            succses: true,
+            success: true,
             msg: 'ok'
         });
         
     } catch (e) {
-
-        res.status(400).json({
-            succses: false,
-            msg: e.message
-        });
+        next(new ControllerError(e.message, e.status, 'addNewFriend'));
     }
 };
