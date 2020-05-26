@@ -1,5 +1,5 @@
 const fs = require('fs');
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 const {resolve: resolvePath} = require('path');
 const mimeTypes = require('../constant/mimeTypes');
 const ControllerError = require('../error/ControllerError');
